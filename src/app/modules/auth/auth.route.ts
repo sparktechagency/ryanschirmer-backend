@@ -12,6 +12,11 @@ router.post(
   validateRequest(authValidation.loginZodValidationSchema),
   authControllers.login,
 );
+router.post(
+  '/google-login',
+  // validateRequest(authValidation.googleLoginValidation),
+  authControllers.googleLogin,
+);
 
 router.post(
   '/refresh-token',
@@ -25,11 +30,12 @@ router.patch(
     USER_ROLE.super_admin,
     USER_ROLE.sub_admin,
     USER_ROLE.admin,
-    USER_ROLE.user, 
+    USER_ROLE.user,
   ),
   authControllers.changePassword,
 );
 
 router.patch('/forgot-password', authControllers.forgotPassword);
 router.patch('/reset-password', authControllers.resetPassword);
+
 export const authRoutes = router;

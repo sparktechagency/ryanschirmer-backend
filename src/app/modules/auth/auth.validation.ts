@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Role, USER_ROLE } from '../user/user.constants';
 
 const loginZodValidationSchema = z.object({
   body: z.object({
@@ -9,6 +10,14 @@ const loginZodValidationSchema = z.object({
       required_error: 'Password is required!',
     }),
   }),
+});
+const googleLoginValidation = z.object({
+  body: z.object({
+    token: z.string({
+      required_error: 'Token is Required',
+    }),
+  }),
+  role: z.enum([...Role] as [string, ...string[]]).default(USER_ROLE.user),
 });
 
 const refreshTokenValidationSchema = z.object({
@@ -22,4 +31,5 @@ const refreshTokenValidationSchema = z.object({
 export const authValidation = {
   refreshTokenValidationSchema,
   loginZodValidationSchema,
+  googleLoginValidation,
 };

@@ -3,6 +3,5 @@ logs/
 **/logs/
 .env
 .vercel
-nn.ts
 generateFolder.ts
 firebase-service-account.json

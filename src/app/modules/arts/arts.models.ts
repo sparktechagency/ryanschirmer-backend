@@ -13,7 +13,7 @@ const artsSchema = new Schema<IArts>(
     },
     category: {
       type: Types.ObjectId,
-      ref: 'categories',
+      ref: 'Categories',
       required: true,
     },
     description: {

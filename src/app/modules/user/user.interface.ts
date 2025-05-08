@@ -14,7 +14,7 @@ export interface IUser {
   dateOfBirth: string;
   profile: string;
   role: string;
-  isGoogleLogin: boolean;
+  loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   address?: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
@@ -23,6 +23,13 @@ export interface IUser {
     otp: string | number;
     expiresAt: Date;
     status: boolean;
+  };
+  device: {
+    ip: string;
+    browser: string;
+    os: string;
+    device: string;
+    lastLogin: string;
   };
 }
 

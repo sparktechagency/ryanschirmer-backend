@@ -37,7 +37,7 @@ function createFolderAndFiles(parentFolderPath, folderName) {
 import httpStatus from 'http-status';
 import { I${capitalizeFirstLetter(folderName)} } from './${folderName}.interface';
 import ${capitalizeFirstLetter(folderName)} from './${folderName}.models';
-import QueryBuilder from '../../builder/QueryBuilder';
+import QueryBuilder from '../../class/builder/QueryBuilder';
 import AppError from '../../error/AppError';
 
 const create${capitalizeFirstLetter(folderName)} = async (payload: I${capitalizeFirstLetter(folderName)}) => {
@@ -50,8 +50,8 @@ const create${capitalizeFirstLetter(folderName)} = async (payload: I${capitalize
 
 const getAll${capitalizeFirstLetter(folderName)} = async (query: Record<string, any>) => {
 query["isDeleted"] = false;
-  const ${folderName}Model = new QueryBuilder(${capitalizeFirstLetter(folderName)}.find(), query)
-    .search([])
+  const ${folderName}Model = new QueryBuilder(${capitalizeFirstLetter(folderName)}.find({isDeleted: false}), query)
+    .search([""])
     .filter()
     .paginate()
     .sort()
@@ -68,8 +68,8 @@ query["isDeleted"] = false;
 
 const get${capitalizeFirstLetter(folderName)}ById = async (id: string) => {
   const result = await ${capitalizeFirstLetter(folderName)}.findById(id);
-  if (!result && result?.isDeleted) {
-    throw new Error('${capitalizeFirstLetter(folderName)} not found!');
+  if (!result || result?.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST,'${capitalizeFirstLetter(folderName)} not found!');
   }
   return result;
 };
@@ -77,7 +77,7 @@ const get${capitalizeFirstLetter(folderName)}ById = async (id: string) => {
 const update${capitalizeFirstLetter(folderName)} = async (id: string, payload: Partial<I${capitalizeFirstLetter(folderName)}>) => {
   const result = await ${capitalizeFirstLetter(folderName)}.findByIdAndUpdate(id, payload, { new: true });
   if (!result) {
-    throw new Error('Failed to update ${capitalizeFirstLetter(folderName)}');
+    throw new AppError(httpStatus.BAD_REQUEST,'Failed to update ${capitalizeFirstLetter(folderName)}');
   }
   return result;
 };

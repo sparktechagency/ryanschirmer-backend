@@ -3,11 +3,11 @@ import { Request, Response } from 'express';
 import { authServices } from './auth.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
-import config from '../../config';
+import config from '../../config'; 
 
 // login
-const login = catchAsync(async (req: Request, res: Response) => {
-  const result = await authServices.login(req.body);
+const login = catchAsync(async (req: Request, res: Response) => { 
+  const result = await authServices.login(req.body, req);
   const { refreshToken } = result;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cookieOptions: any = {

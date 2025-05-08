@@ -17,9 +17,11 @@ import { IUser } from '../user/user.interface';
 import { User } from '../user/user.models';
 import path from 'path';
 import fs from 'fs';
+import UAParser from 'ua-parser-js';
+import { Request } from 'express';
 
 // Login
-const login = async (payload: TLogin) => {
+const login = async (payload: TLogin, req: Request) => {
   const user: IUser | null = await User.isUserExist(payload?.email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -52,7 +54,30 @@ const login = async (payload: TLogin) => {
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string,
   );
+  if (user) {
+    const ip =
+      req.headers['x-forwarded-for']?.toString().split(',')[0] ||
+      req.socket.remoteAddress ||
+      '';
 
+    const userAgent = req.headers['user-agent'] || '';
+    //@ts-ignore
+    const parser = new UAParser(userAgent);
+    const result = parser.getResult();
+    const device = {
+      ip: ip,
+      browser: result.browser.name,
+      os: result.os.name,
+      device: result.device.model || 'Desktop',
+      lastLogin: new Date().toISOString(),
+    };
+
+    await User.findByIdAndUpdate(
+      user?._id,
+      { device },
+      { new: true, upsert: false },
+    );
+  }
   return {
     user,
     accessToken,
@@ -127,20 +152,20 @@ const forgotPassword = async (email: string) => {
     },
   });
 
-    const otpEmailPath = path.join(
-      __dirname,
-      '../../../../public/view/forgot_pass_mail.html',
-    );
+  const otpEmailPath = path.join(
+    __dirname,
+    '../../../../public/view/forgot_pass_mail.html',
+  );
 
-    await sendEmail(
-      user?.email,
-      'Your reset password OTP is',
-      fs
-        .readFileSync(otpEmailPath, 'utf8')
-        .replace('{{otp}}', otp)
-        .replace('{{email}}', user?.email),
-    );
-    
+  await sendEmail(
+    user?.email,
+    'Your reset password OTP is',
+    fs
+      .readFileSync(otpEmailPath, 'utf8')
+      .replace('{{otp}}', otp)
+      .replace('{{email}}', user?.email),
+  );
+
   // await sendEmail(
   //   email,
   //   'Your reset password OTP is:',

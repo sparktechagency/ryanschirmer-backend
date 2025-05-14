@@ -1,0 +1,90 @@
+import httpStatus from 'http-status';
+import { IProducts } from './products.interface';
+import Products from './products.models';
+import QueryBuilder from '../../class/builder/QueryBuilder';
+import AppError from '../../error/AppError';
+import { uploadToS3 } from '../../utils/s3';
+import generateCryptoString from '../../utils/generateCryptoString';
+
+const createProducts = async (payload: IProducts, file: any) => {
+  if (file) {
+    payload.image = (await uploadToS3({
+      file: file,
+      fileName: `images/service/images${generateCryptoString(6)}`,
+    })) as string;
+  }
+
+
+
+  const result = await Products.create(payload);
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create products');
+  }
+  return result;
+};
+
+const getAllProducts = async (query: Record<string, any>) => {
+  const productsModel = new QueryBuilder(
+    Products.find({ isDeleted: false }),
+    query,
+  )
+    .search(['name'])
+    .filter()
+    .paginate()
+    .sort()
+    .fields();
+
+  const data = await productsModel.modelQuery;
+  const meta = await productsModel.countTotal();
+
+  return {
+    data,
+    meta,
+  };
+};
+
+const getProductsById = async (id: string) => {
+  const result = await Products.findById(id);
+  if (!result || result?.isDeleted) {
+    throw new Error('Products not found!');
+  }
+  return result;
+};
+
+const updateProducts = async (
+  id: string,
+  payload: Partial<IProducts>,
+  file: any,
+) => {
+  if (file) {
+    payload.image = (await uploadToS3({
+      file: file,
+      fileName: `images/service/images${generateCryptoString(6)}`,
+    })) as string;
+  }
+  const result = await Products.findByIdAndUpdate(id, payload, { new: true });
+  if (!result) {
+    throw new Error('Failed to update Products');
+  }
+  return result;
+};
+
+const deleteProducts = async (id: string) => {
+  const result = await Products.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true },
+  );
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete products');
+  }
+  return result;
+};
+
+export const productsService = {
+  createProducts,
+  getAllProducts,
+  getProductsById,
+  updateProducts,
+  deleteProducts,
+};

@@ -20,8 +20,7 @@ import fs from 'fs';
 import UAParser from 'ua-parser-js';
 import { Request } from 'express';
 import firebaseAdmin from '../../utils/firebase';
-import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
-import { isDeepStrictEqual } from 'util';
+import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'; 
 import { Login_With, USER_ROLE } from '../user/user.constants';
 
 // Login

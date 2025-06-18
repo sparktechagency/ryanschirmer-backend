@@ -14,7 +14,7 @@ const createOrders = async (payload: IOrders) => {
 };
 
 const getAllOrders = async (query: Record<string, any>) => {
-query["isDeleted"] = false;
+ 
   const ordersModel = new QueryBuilder(Orders.find({isDeleted: false}), query)
     .search([""])
     .filter()

@@ -1,6 +1,6 @@
 import { Model, ObjectId } from 'mongoose';
 
-interface IItems {
+export interface IItems {
   product: ObjectId;
   quantity: number;
   price: number;
@@ -11,6 +11,9 @@ export interface IOrders {
   author: ObjectId;
   totalPrice: number;
   items: IItems[];
+  isPaid: boolean;
+  tranId: string;
+  isDeleted: boolean;
 }
 
 export type IOrdersModules = Model<IOrders, Record<string, unknown>>;

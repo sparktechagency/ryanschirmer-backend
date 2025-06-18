@@ -8,6 +8,7 @@ import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './app/middleware/globalErrorhandler';
 import notFound from './app/middleware/notfound';
 import router from './app/routes';
+import axios from 'axios';
 const app: Application = express();
 app.use(express.static('public'));
 app.use(express.json({ limit: '500mb' }));
@@ -29,6 +30,46 @@ app.use(
 
 // application routes
 app.use('/api/v1', router);
+app.post('/return', async (req, res) => {
+  try {
+    console.log('---------------------------->>');
+    const url = 'http://192.168.10.43:5010/api/v1/payments/redirect';
+    const body = req.body;
+    const query = req.query;
+    const data = await axios.post(url, body, {
+      params: query, // These are query parameters (?search=example&page=2)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log(data?.data);
+    res.send({ success: true, message: 'success' });
+  } catch (error: any) {
+    console.log(error);
+    res.send({ success: false, message: error?.messages });
+  }
+});
+app.post('/', async (req, res) => {
+  try {
+    console.log('---------------------------->>');
+    const url = 'http://192.168.10.43:5010/api/v1/payments/callback';
+    const body = req.body;
+    const query = req.query;
+    const data = await axios.post(url, body, {
+      params: query, // These are query parameters (?search=example&page=2)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log(data?.data);
+    res.send({ success: true, message: 'success' });
+  } catch (error: any) {
+    console.log(error);
+    res.send({ success: false, message: error?.messages });
+  }
+});
 app.get('/', (req: Request, res: Response) => {
   res.send('server is running');
 });

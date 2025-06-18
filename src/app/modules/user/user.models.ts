@@ -67,6 +67,12 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       default: null,
     },
+
+    descriptions: {
+      type: String,
+      default: null,
+    },
+
     needsPasswordChange: {
       type: Boolean,
     },

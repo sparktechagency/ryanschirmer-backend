@@ -21,7 +21,10 @@ const createCategory = async (payload: ICategory) => {
 };
 
 const getAllCategories = async (query: Record<string, any>) => {
-  const categoriesModel = new QueryBuilder(Category.find(), query)
+  const categoriesModel = new QueryBuilder(
+    Category.find({ isDeleted: false }),
+    query,
+  )
     .search(['name'])
     .filter()
     .paginate()
@@ -39,7 +42,7 @@ const getAllCategories = async (query: Record<string, any>) => {
 
 const getCategoryById = async (id: string) => {
   const result = await Category.findById(id);
-  if (!result) {
+  if (!result || result?.isDeleted) {
     throw new Error('Category not found');
   }
   return result;

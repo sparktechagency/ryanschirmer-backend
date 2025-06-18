@@ -13,6 +13,7 @@ export interface IUser {
   gender: 'Male' | 'Female' | 'Others';
   dateOfBirth: string;
   profile: string;
+  descriptions: string;
   role: string;
   loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   address?: string;

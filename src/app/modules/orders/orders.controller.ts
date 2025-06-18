@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import { ordersService } from './orders.service';
 import sendResponse from '../../utils/sendResponse';
+import { USER_ROLE } from '../user/user.constants';
 
 const createOrders = catchAsync(async (req: Request, res: Response) => {
   req.body.user = req.user.userId;
@@ -24,7 +25,12 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getMyOrders = catchAsync(async (req: Request, res: Response) => {
-  req.query['user'] = req.user.userId;
+  if (req.user.role === USER_ROLE.seller) {
+    req.query['author'] = req.user.userId;
+  } else if (req.user.role === USER_ROLE.user) {
+    req.query['user'] = req.user.userId;
+  }
+
   const result = await ordersService.getAllOrders(req.query);
   sendResponse(res, {
     statusCode: 200,

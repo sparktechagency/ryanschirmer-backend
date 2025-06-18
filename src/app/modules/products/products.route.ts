@@ -24,7 +24,7 @@ router.patch(
   auth(USER_ROLE.seller, USER_ROLE.admin),
   upload.single('image'),
   parseData(),
-  validateRequest(productValidation.createProductSchema),
+  validateRequest(productValidation.updateProductSchema),
   productsController.updateProducts,
 );
 router.delete(

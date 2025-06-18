@@ -17,10 +17,16 @@ router.delete(
   ordersController.deleteOrders,
 );
 router.get(
+  '/my-orders',
+  auth(USER_ROLE.user, USER_ROLE.seller, USER_ROLE.admin),
+  ordersController.getMyOrders,
+);
+router.get(
   '/:id',
   auth(USER_ROLE.user, USER_ROLE.seller, USER_ROLE.admin),
   ordersController.getOrdersById,
 );
+
 router.get(
   '/',
   auth(USER_ROLE.user, USER_ROLE.seller, USER_ROLE.admin),

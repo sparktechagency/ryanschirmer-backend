@@ -39,7 +39,7 @@ export const deleteFromS3 = async (url: string) => {
   try {
     const urlObj = new URL(url);
     const key = urlObj?.pathname;
-
+    console.log(key);
     const command = new DeleteObjectCommand({
       Bucket: config.aws.bucket,
       Key: key,

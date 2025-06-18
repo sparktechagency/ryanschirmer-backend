@@ -109,11 +109,12 @@ const resendOtp = async (email: string) => {
     expiresIn: '3m',
   });
 
-    const otpEmailPath = path.join(
-      __dirname,
-      '../../../../public/view/otp_mail.html',
-    );
+  const otpEmailPath = path.join(
+    __dirname,
+    '../../../../public/view/otp_mail.html',
+  );
 
+  try {
     await sendEmail(
       user?.email,
       'Your One Time OTP',
@@ -122,8 +123,10 @@ const resendOtp = async (email: string) => {
         .replace('{{otp}}', otp)
         .replace('{{email}}', user?.email),
     );
-
-
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(user);
   // await sendEmail(
   //   user?.email,
   //   'Your One Time OTP',

@@ -7,25 +7,20 @@ const ItemSchema = new Schema<IItems>({
   price: { type: Number, required: true, min: 0 },
 });
 
- 
 const ordersSchema = new Schema<IOrders>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    author: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     totalPrice: { type: Number, required: true, min: 0 },
     items: { type: [ItemSchema], required: true },
     isPaid: { type: Boolean, required: true, default: false },
-    tranId: { type: String, required: true },
+    tranId: { type: String },
     isDeleted: { type: 'boolean', default: false },
   },
   {
     timestamps: true,
   },
 );
-
- 
-
- 
 
 const Orders = model<IOrders, IOrdersModules>('Orders', ordersSchema);
 export default Orders;

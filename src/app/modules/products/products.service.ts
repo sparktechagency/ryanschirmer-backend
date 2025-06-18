@@ -3,18 +3,18 @@ import { IProducts } from './products.interface';
 import Products from './products.models';
 import QueryBuilder from '../../class/builder/QueryBuilder';
 import AppError from '../../error/AppError';
-import { uploadToS3 } from '../../utils/s3';
-import generateCryptoString from '../../utils/generateCryptoString';
+import { deleteFromS3, uploadToS3 } from '../../utils/s3';
+import generateCryptoString, {
+  generateImageCode,
+} from '../../utils/generateCryptoString';
 
 const createProducts = async (payload: IProducts, file: any) => {
   if (file) {
     payload.image = (await uploadToS3({
       file: file,
-      fileName: `images/service/images${generateCryptoString(6)}`,
+      fileName: `images/service/images/${generateImageCode(6)}`,
     })) as string;
   }
-
-
 
   const result = await Products.create(payload);
   if (!result) {
@@ -59,7 +59,7 @@ const updateProducts = async (
   if (file) {
     payload.image = (await uploadToS3({
       file: file,
-      fileName: `images/service/images${generateCryptoString(6)}`,
+      fileName: `images/service/images/${generateImageCode(6)}`,
     })) as string;
   }
   const result = await Products.findByIdAndUpdate(id, payload, { new: true });
@@ -78,6 +78,10 @@ const deleteProducts = async (id: string) => {
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete products');
   }
+
+  // if (data?.image) {
+  //   await deleteFromS3(data?.image);
+  // }
   return result;
 };
 

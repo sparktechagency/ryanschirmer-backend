@@ -8,6 +8,8 @@ import { productsRoutes } from '../modules/products/products.route';
 import { categoryRoutes } from './../modules/category/category.route';
 import { artsRoutes } from '../modules/arts/arts.route';
 import stripeRoute from '../modules/stripe/stripe.route';
+import { ordersRoutes } from '../modules/orders/orders.route';
+import { bannersRoutes } from '../modules/banners/banners.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -33,20 +35,28 @@ const moduleRoutes = [
   },
   {
     path: '/products',
-    route: productsRoutes
+    route: productsRoutes,
   },
   {
-    path:'/category',
-    route:categoryRoutes 
+    path: '/category',
+    route: categoryRoutes,
   },
   {
-    path:'/arts',
-    route: artsRoutes
+    path: '/arts',
+    route: artsRoutes,
   },
   {
-    path:'/stripe',
-    route: stripeRoute
-  }
+    path: '/orders',
+    route: ordersRoutes,
+  },
+  {
+    path: '/stripe',
+    route: stripeRoute,
+  },
+  {
+    path: '/banners',
+    route: bannersRoutes,
+  },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 

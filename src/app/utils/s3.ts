@@ -35,8 +35,11 @@ export const uploadToS3 = async (
 };
 
 // delete file from s3 bucket
-export const deleteFromS3 = async (key: string) => {
+export const deleteFromS3 = async (url: string) => {
   try {
+    const urlObj = new URL(url);
+    const key = urlObj?.pathname;
+
     const command = new DeleteObjectCommand({
       Bucket: config.aws.bucket,
       Key: key,

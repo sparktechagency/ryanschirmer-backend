@@ -10,6 +10,7 @@ router.patch(
   auth(USER_ROLE.seller),
   stripeController.stripLinkAccount,
 );
+
 router.get('/oauth/callback', stripeController?.handleStripeOAuth);
 router.post('/return', stripeController.returnUrl);
 router.get('/refresh/:id', stripeController.refresh);

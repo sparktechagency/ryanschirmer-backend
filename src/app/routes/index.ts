@@ -10,6 +10,7 @@ import { artsRoutes } from '../modules/arts/arts.route';
 import stripeRoute from '../modules/stripe/stripe.route';
 import { ordersRoutes } from '../modules/orders/orders.route';
 import { bannersRoutes } from '../modules/banners/banners.route';
+import { paymentsRoutes } from '../modules/payments/payments.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -44,6 +45,10 @@ const moduleRoutes = [
   {
     path: '/arts',
     route: artsRoutes,
+  },
+  {
+    path: '/payments',
+    route: paymentsRoutes,
   },
   {
     path: '/orders',

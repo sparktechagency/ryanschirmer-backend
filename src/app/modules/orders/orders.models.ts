@@ -2,8 +2,7 @@ import { model, Schema, Types } from 'mongoose';
 import { IOrders, IItems, IOrdersModules } from './orders.interface';
 
 const ItemSchema = new Schema<IItems>({
-  product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-  quantity: { type: Number, required: true, min: 1 },
+  product: { type: Schema.Types.ObjectId, ref: 'Products', required: true }, 
   price: { type: Number, required: true, min: 0 },
 });
 

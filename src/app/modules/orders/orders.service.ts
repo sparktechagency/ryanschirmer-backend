@@ -1,4 +1,3 @@
-
 import httpStatus from 'http-status';
 import { IOrders } from './orders.interface';
 import Orders from './orders.models';
@@ -14,9 +13,15 @@ const createOrders = async (payload: IOrders) => {
 };
 
 const getAllOrders = async (query: Record<string, any>) => {
- 
-  const ordersModel = new QueryBuilder(Orders.find({isDeleted: false}), query)
-    .search([""])
+  const ordersModel = new QueryBuilder(
+    Orders.find({ isDeleted: false }).populate([
+      { path: 'author', select: 'name email phoneNumber profile' },
+      { path: 'user', select: 'name email phoneNumber profile' },
+      { path: 'items.product' },
+    ]),
+    query,
+  )
+    .search([''])
     .filter()
     .paginate()
     .sort()
@@ -32,9 +37,13 @@ const getAllOrders = async (query: Record<string, any>) => {
 };
 
 const getOrdersById = async (id: string) => {
-  const result = await Orders.findById(id);
+  const result = await Orders.findById(id).populate([
+    { path: 'author', select: 'name email phoneNumber profile' },
+    { path: 'user', select: 'name email phoneNumber profile' },
+    { path: 'items.product' },
+  ]);
   if (!result || result?.isDeleted) {
-    throw new AppError(httpStatus.BAD_REQUEST,'Orders not found!');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Orders not found!');
   }
   return result;
 };
@@ -42,7 +51,7 @@ const getOrdersById = async (id: string) => {
 const updateOrders = async (id: string, payload: Partial<IOrders>) => {
   const result = await Orders.findByIdAndUpdate(id, payload, { new: true });
   if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST,'Failed to update Orders');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update Orders');
   }
   return result;
 };
@@ -51,7 +60,7 @@ const deleteOrders = async (id: string) => {
   const result = await Orders.findByIdAndUpdate(
     id,
     { isDeleted: true },
-    { new: true }
+    { new: true },
   );
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete orders');

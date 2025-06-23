@@ -2,7 +2,6 @@ import { Model, ObjectId } from 'mongoose';
 
 export interface IItems {
   product: ObjectId;
-  quantity: number;
   price: number;
 }
 

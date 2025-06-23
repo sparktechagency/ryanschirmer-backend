@@ -5,10 +5,11 @@ import { userValidation } from './user.validation';
 import auth from '../../middleware/auth';
 import { USER_ROLE } from './user.constants';
 import parseData from '../../middleware/parseData';
-import fileUpload from '../../middleware/fileUpload';
-const upload = fileUpload('./public/uploads/profile');
+import multer, { memoryStorage } from 'multer';
 
 const router = Router();
+const storage = memoryStorage();
+const upload = multer({ storage });
 
 router.post(
   '/',
@@ -71,6 +72,6 @@ router.get(
 
 router.get('/:id', userController.getUserById);
 
-router.get('/', auth(USER_ROLE.admin), userController.getAllUser);
+router.get('/', userController.getAllUser);
 
 export const userRoutes = router;

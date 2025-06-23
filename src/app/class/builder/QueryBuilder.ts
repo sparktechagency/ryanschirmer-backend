@@ -52,23 +52,23 @@ class QueryBuilder<T> {
   }
 
   // Range filter
-  // rangeFilter<K extends keyof T>(field: K, range: string) {
-  //   if (range) {
-  //     const [min, max] = range.split('-').map(Number);
-  //     // Check if both min and max are valid numbers
-  //     if (!isNaN(min) && !isNaN(max)) {
-  //       const filter: any = {
-  //         [field]: { $gte: min, $lte: max } as any,
-  //       };
-  //       this.modelQuery = this.modelQuery.find(filter);
-  //     } else {
-  //       // Handle invalid range values if needed
-  //       //@ts-ignore
-  //       console.warn(`Invalid range value for field ${field}: ${range}`);
-  //     }
-  //   }
-  //   return this;
-  // }
+  rangeFilter<K extends keyof T>(field: K, range: string) {
+    if (range) {
+      const [min, max] = range.split('-').map(Number);
+      // Check if both min and max are valid numbers
+      if (!isNaN(min) && !isNaN(max)) {
+        const filter: any = {
+          [field]: { $gte: min, $lte: max } as any,
+        };
+        this.modelQuery = this.modelQuery.find(filter);
+      } else {
+        // Handle invalid range values if needed
+        //@ts-ignore
+        console.warn(`Invalid range value for field ${field}: ${range}`);
+      }
+    }
+    return this;
+  }
 
     // Filter
   filter() {

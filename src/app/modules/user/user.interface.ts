@@ -5,9 +5,10 @@ export interface IUser {
   // [x: string]: any;
   _id?: Types.ObjectId;
   status: string;
-  username: string;
+  experience: string;
   name: string;
   email: string;
+  designation: string;
   phoneNumber: string;
   password: string;
   gender: 'Male' | 'Female' | 'Others';
@@ -15,6 +16,7 @@ export interface IUser {
   profile: string;
   descriptions: string;
   role: string;
+  customerId: string;
   loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   address?: string;
   needsPasswordChange: boolean;

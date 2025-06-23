@@ -17,6 +17,14 @@ const userSchema: Schema<IUser> = new Schema(
       required: true,
       default: null,
     },
+    designation: {
+      type: String,
+      default: null,
+    },
+    experience: {
+      type: String,
+      default: null,
+    },
 
     email: {
       type: String,
@@ -64,6 +72,10 @@ const userSchema: Schema<IUser> = new Schema(
     },
 
     address: {
+      type: String,
+      default: null,
+    },
+    customerId: {
       type: String,
       default: null,
     },

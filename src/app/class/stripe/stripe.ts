@@ -1,14 +1,14 @@
-import { Stripe as StripeType } from 'stripe';
+import Stripe, { Stripe as StripeType } from 'stripe';
 import config from '../../config';
 interface IProducts {
   amount: number;
   name: string;
   quantity: number;
 }
-class StripeService<T> {
+class StripeServices<T> {
   private stripe() {
     return new StripeType(config.stripe?.stripe_api_secret as string, {
-      apiVersion: '2024-06-20',
+      apiVersion: '2025-05-28.basil',
       typescript: true,
     });
   }
@@ -29,12 +29,16 @@ class StripeService<T> {
 
   public async connectAccount(returnUrl: string, refreshUrl: string) {
     try {
-      const account = await this.stripe().accounts.create({
-        // email: user?.email, (optional: uncomment if you want to pass user's email)
-      });
+      const accountId = (await StripeService.getStripe()
+        .accounts.create({
+          // email: user?.email, (optional: uncomment if you want to pass user's email)
+        })
+        .then(account => {
+          account.id;
+        })) as string;
 
       const accountLink = await this.stripe().accountLinks.create({
-        account: account.id,
+        account: accountId,
         return_url: returnUrl,
         refresh_url: refreshUrl,
         type: 'account_onboarding',
@@ -89,12 +93,30 @@ class StripeService<T> {
     }
   }
 
-  public async refund(payment_intent: string, amount: number) {
+  public async refund(payment_intent: string, amount?: number) {
     try {
-      return await this.stripe().refunds.create({
-        payment_intent: payment_intent,
-        amount: Math.round(amount),
-      });
+      const paymentIntentResponse = await this.stripe().paymentIntents.retrieve(
+        payment_intent,
+        { expand: ['charges'] },
+      );
+      const chargeId = paymentIntentResponse?.latest_charge as string;
+      // const chargeId = charges[0].id;
+      if (!chargeId) {
+        throw new Error('Charge ID not found for the payment intent');
+      }
+
+      const payload: Stripe.RefundCreateParams = {
+        charge: chargeId,
+      };
+
+      if (amount) {
+        payload.amount = Math.round(amount); // Amount should be in cents
+      }
+
+      // Optional: You can add reason from the valid enum if needed
+      // payload.reason = 'requested_by_customer';
+
+      return await this.stripe().refunds.create(payload);
     } catch (error) {
       this.handleError(error, 'Error processing refund');
     }
@@ -108,10 +130,9 @@ class StripeService<T> {
     }
   }
 
-  public async getPaymentStatus(session_id: string) {
+  public async getPaymentSession(session_id: string) {
     try {
-      return (await this.stripe().checkout.sessions.retrieve(session_id))
-        .status;
+      return await this.stripe().checkout.sessions.retrieve(session_id);
       // return (await this.stripe().paymentIntents.retrieve(intents_id)).status;
     } catch (error) {
       this.handleError(error, 'Error retrieving payment status');
@@ -133,9 +154,9 @@ class StripeService<T> {
     product: IProducts,
     success_url: string,
     cancel_url: string,
+    customer: string = '', // Optional: customer ID for Stripe
     currency: string = 'usd',
     payment_method_types: Array<'card' | 'paypal' | 'ideal'> = ['card'],
-    customer: string = '', // Optional: customer ID for Stripe
   ) {
     try {
       if (!product?.name || !product?.amount || !product?.quantity) {
@@ -183,9 +204,24 @@ class StripeService<T> {
       this.handleError(error, 'Error creating checkout session');
     }
   }
+
+  public async createCustomer(email: string, name: string) {
+    try {
+      return await this.stripe().customers.create({
+        email,
+        name,
+        //   description: 'HandyHub.pro Customer', // Optional: for dashboard reference
+        //   metadata: {
+        //     platform: 'HandyHub.pro', // Custom metadata for tracking
+        //   },
+      });
+    } catch (error) {
+      this.handleError(error, 'customer creation failed');
+    }
+  }
   public getStripe() {
     return this.stripe();
   }
 }
-
-export default new StripeService();
+const StripeService = new StripeServices();
+export default StripeService;

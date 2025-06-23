@@ -3,10 +3,8 @@ import { IProducts } from './products.interface';
 import Products from './products.models';
 import QueryBuilder from '../../class/builder/QueryBuilder';
 import AppError from '../../error/AppError';
-import { deleteFromS3, uploadToS3 } from '../../utils/s3';
-import generateCryptoString, {
-  generateImageCode,
-} from '../../utils/generateCryptoString';
+import { uploadToS3 } from '../../utils/s3';
+import { generateImageCode } from '../../utils/generateCryptoString';
 
 const createProducts = async (payload: IProducts, file: any) => {
   if (file) {
@@ -24,12 +22,20 @@ const createProducts = async (payload: IProducts, file: any) => {
 };
 
 const getAllProducts = async (query: Record<string, any>) => {
+  const { priceRange, ...queries } = query;
   const productsModel = new QueryBuilder(
-    Products.find({ isDeleted: false }),
-    query,
+    Products.find({ isDeleted: false }).populate([
+      {
+        path: 'author',
+        select: 'name email phoneNumber profile _id designation',
+      },
+      { path: 'category' },
+    ]),
+    queries,
   )
     .search(['name'])
     .filter()
+    .rangeFilter('price', priceRange)
     .paginate()
     .sort()
     .fields();
@@ -44,7 +50,13 @@ const getAllProducts = async (query: Record<string, any>) => {
 };
 
 const getProductsById = async (id: string) => {
-  const result = await Products.findById(id);
+  const result = await Products.findById(id).populate([
+    {
+      path: 'author',
+      select: 'name email phoneNumber profile _id designation',
+    },
+    { path: 'category' },
+  ]);
   if (!result || result?.isDeleted) {
     throw new Error('Products not found!');
   }

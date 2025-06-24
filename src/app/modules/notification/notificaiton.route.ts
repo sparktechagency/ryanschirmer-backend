@@ -9,7 +9,7 @@ router.get(
   '/',
   auth(
     USER_ROLE.user,
-    USER_ROLE.admin, 
+    USER_ROLE.admin,
     USER_ROLE.sub_admin,
     USER_ROLE.super_admin,
   ),
@@ -19,11 +19,23 @@ router.patch(
   '/',
   auth(
     USER_ROLE.user,
-    USER_ROLE.admin, 
+    USER_ROLE.admin,
     USER_ROLE.sub_admin,
     USER_ROLE.super_admin,
+    USER_ROLE.seller,
   ),
   notificationControllers.markAsDone,
+);
+router.delete(
+  '/',
+  auth(
+    USER_ROLE.user,
+    USER_ROLE.admin,
+    USER_ROLE.sub_admin,
+    USER_ROLE.super_admin,
+    USER_ROLE.seller,
+  ),
+  notificationControllers.deleteNotification,
 );
 
 export const notificationRoutes = router;

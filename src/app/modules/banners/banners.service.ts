@@ -8,19 +8,20 @@ import { generateImageCode } from '../../utils/generateCryptoString';
 
 const createBanners = async (payload: IBanners, file: any) => {
   const isExist = await Banners.isExistByCategory(payload?.category);
-  if (isExist) {
-    throw new AppError(
-      httpStatus.BAD_GATEWAY,
-      'This type of banner already exist',
-    );
-  }
+
   if (file) {
     payload.image = (await uploadToS3({
       file,
       fileName: generateImageCode(5),
     })) as string;
   }
-
+  if (isExist) {
+    const result = await Banners.findByIdAndUpdate(isExist?._id, payload);
+    if (!result) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create banners');
+    }
+    return result;
+  }
   const result = await Banners.create(payload);
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create banners');

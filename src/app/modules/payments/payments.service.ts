@@ -15,6 +15,7 @@ import { IOrders } from '../orders/orders.interface';
 import StripeService from '../../class/stripe/stripe';
 import QueryBuilder from '../../class/builder/QueryBuilder';
 import { Response } from 'express';
+import moment from 'moment';
 
 const checkout = async (payload: IPayments) => {
   const tranId = generateCryptoString(10);
@@ -95,7 +96,7 @@ const checkout = async (payload: IPayments) => {
   return checkoutSession?.url;
 };
 
-const confirmPayment = async (query: Record<string, any>, res:Response) => {
+const confirmPayment = async (query: Record<string, any>, res: Response) => {
   const { sessionId, paymentId } = query;
   const session = await startSession();
   const PaymentSession = await StripeService.getPaymentSession(sessionId);
@@ -167,11 +168,172 @@ const confirmPayment = async (query: Record<string, any>, res:Response) => {
         console.error('Error processing refund:', refundError.message);
       }
     }
-    res.redirect(`${config.client_Url}/payment-failed/?errorMessage=${error.message}`);
+    res.redirect(
+      `${config.client_Url}/payment-failed/?errorMessage=${error.message}`,
+    );
     throw new AppError(httpStatus.BAD_GATEWAY, error.message);
   } finally {
     session.endSession();
   }
+};
+
+const dashboardData = async (query: Record<string, any>) => {
+  const today = moment().startOf('day');
+  const incomeYear = query.incomeYear
+    ? Number(query.incomeYear)
+    : moment().year();
+  const userYear = query.JoinYear ? Number(query.JoinYear) : moment().year();
+
+  const [usersData, earningsData, monthlyIncomeData, monthlyUserData] =
+    await Promise.all([
+      // User data aggregation
+      User.aggregate([
+        {
+          $facet: {
+            totalUsers: [
+              {
+                $match: {
+                  'verification.status': true,
+                  role: { $ne: USER_ROLE.admin },
+                },
+              },
+              { $count: 'count' },
+            ],
+            userDetails: [
+              {
+                $match: { role: { $ne: USER_ROLE.admin } },
+              },
+              {
+                $project: {
+                  _id: 1,
+                  name: 1,
+                  email: 1,
+                  status: 1,
+                  phoneNumber: 1,
+                  image: 1, 
+                  role: 1,
+                  createdAt: 1,
+                },
+              },
+              {
+                $sort: { createdAt: -1 },
+              },
+              {
+                $limit: 15,
+              },
+            ],
+          },
+        },
+      ]),
+
+      // Earnings aggregation (including today's income)
+      Payments.aggregate([
+        {
+          $match: { status: 'paid' },
+        },
+        {
+          $facet: {
+            totalEarnings: [
+              {
+                $group: {
+                  _id: null,
+                  total: { $sum: '$adminAmount' },
+                },
+              },
+            ],
+            todayEarnings: [
+              {
+                $match: {
+                  createdAt: {
+                    $gte: today.toDate(),
+                    $lte: moment().endOf('day').toDate(),
+                  },
+                },
+              },
+              {
+                $group: {
+                  _id: null,
+                  total: { $sum: '$adminAmount' },
+                },
+              },
+            ],
+          },
+        },
+      ]),
+
+      // Monthly income aggregation
+      Payments.aggregate([
+        {
+          $match: {
+            status: 'paid',
+            createdAt: {
+              $gte: moment().year(incomeYear).startOf('year').toDate(),
+              $lte: moment().year(incomeYear).endOf('year').toDate(),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { month: { $month: '$createdAt' } },
+            income: { $sum: '$adminAmount' },
+          },
+        },
+        {
+          $sort: { '_id.month': 1 },
+        },
+      ]),
+
+      // Monthly users aggregation
+      User.aggregate([
+        {
+          $match: {
+            'verification.status': true,
+            createdAt: {
+              $gte: moment().year(userYear).startOf('year').toDate(),
+              $lte: moment().year(userYear).endOf('year').toDate(),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { month: { $month: '$createdAt' } },
+            total: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { '_id.month': 1 },
+        },
+      ]),
+    ]);
+
+  // Format monthly income
+  const formattedMonthlyIncome = Array.from({ length: 12 }, (_, i) => ({
+    month: moment().month(i).format('MMM'),
+    income: 0,
+  }));
+  monthlyIncomeData.forEach(entry => {
+    formattedMonthlyIncome[entry._id.month - 1].income = Math.round(
+      entry.income,
+    );
+  });
+
+  // Format monthly users
+  const formattedMonthlyUsers = Array.from({ length: 12 }, (_, i) => ({
+    month: moment().month(i).format('MMM'),
+    total: 0,
+  }));
+  monthlyUserData.forEach(entry => {
+    formattedMonthlyUsers[entry._id.month - 1].total = Math.round(entry.total);
+  });
+
+  return {
+    totalUsers: usersData[0]?.totalUsers[0]?.count || 0,
+    totalIncome: earningsData[0]?.totalEarnings[0]?.total || 0,
+    todayIncome: earningsData[0]?.todayEarnings[0]?.total || 0,
+    monthlyIncome: formattedMonthlyIncome,
+    monthlyUsers: formattedMonthlyUsers,
+    userDetails: usersData[0]?.userDetails || [],
+  };
 };
 
 const createPayments = async (payload: IPayments) => {
@@ -236,4 +398,5 @@ export const paymentsService = {
   deletePayments,
   checkout,
   confirmPayment,
+  dashboardData,
 };

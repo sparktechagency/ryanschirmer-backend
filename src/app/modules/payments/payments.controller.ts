@@ -27,7 +27,15 @@ const confirmPayment = catchAsync(async (req: Request, res: Response) => {
     message: 'payment successful',
   });
 });
-
+const dashboardData = catchAsync(async (req: Request, res: Response) => {
+  const result = await paymentsService.dashboardData(req?.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    data: result,
+    message: 'dashboard data successful',
+  });
+});
 const createPayments = catchAsync(async (req: Request, res: Response) => {
   const result = await paymentsService.createPayments(req.body);
   sendResponse(res, {
@@ -85,4 +93,5 @@ export const paymentsController = {
   deletePayments,
   confirmPayment,
   checkout,
+  dashboardData,
 };

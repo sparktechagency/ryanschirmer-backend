@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 
 export interface IBanners {
+  _id?: string;
   category: string;
   image: string;
 }

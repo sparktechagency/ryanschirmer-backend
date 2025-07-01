@@ -27,15 +27,17 @@ class StripeServices<T> {
     }
   }
 
-  public async connectAccount(returnUrl: string, refreshUrl: string) {
+  public async connectAccount(
+    returnUrl: string,
+    refreshUrl: string,
+    accountId:string,
+  ) {
     try {
-      const accountId = (await StripeService.getStripe()
-        .accounts.create({
-          // email: user?.email, (optional: uncomment if you want to pass user's email)
-        })
-        .then(account => {
-          account.id;
-        })) as string;
+   
+      console.log(
+        '🚀 ~ StripeServices<T> ~ connectAccount ~ accountId:',
+        accountId,
+      );
 
       const accountLink = await this.stripe().accountLinks.create({
         account: accountId,

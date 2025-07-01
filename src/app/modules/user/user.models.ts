@@ -88,6 +88,10 @@ const userSchema: Schema<IUser> = new Schema(
     needsPasswordChange: {
       type: Boolean,
     },
+    stripeAccountId: {
+      type: String,
+      default: null,
+    },
     passwordChangedAt: {
       type: Date,
     },

@@ -20,6 +20,7 @@ export interface IUser {
   loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   address?: string;
   needsPasswordChange: boolean;
+  stripeAccountId: string;
   passwordChangedAt?: Date;
   isDeleted: boolean;
   verification: {

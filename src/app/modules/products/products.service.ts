@@ -33,7 +33,7 @@ const getAllProducts = async (query: Record<string, any>) => {
     ]),
     queries,
   )
-    .search(['name'])
+    .search(['title'])
     .filter()
     .rangeFilter('price', priceRange)
     .paginate()

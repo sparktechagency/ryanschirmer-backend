@@ -1,6 +1,7 @@
 import {
   DeleteObjectCommand,
   DeleteObjectsCommand,
+  ObjectCannedACL,
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import httpStatus from 'http-status';
@@ -18,6 +19,7 @@ export const uploadToS3 = async (
     Key: fileName,
     Body: file.buffer,
     ContentType: file.mimetype,
+    ACL: ObjectCannedACL.public_read, //access public read
   });
 
   try {
@@ -25,8 +27,7 @@ export const uploadToS3 = async (
     if (!key) {
       throw new AppError(httpStatus.BAD_REQUEST, 'File Upload failed');
     }
-
-    const url = `https://${config.aws.bucket}.s3.${config.aws.region}.amazonaws.com/${fileName}`;
+    const url = `${config?.aws?.s3BaseUrl}/${fileName}`;
 
     return url;
   } catch (error) {
@@ -35,11 +36,8 @@ export const uploadToS3 = async (
 };
 
 // delete file from s3 bucket
-export const deleteFromS3 = async (url: string) => {
+export const deleteFromS3 = async (key: string) => {
   try {
-    const urlObj = new URL(url);
-    const key = urlObj?.pathname;
-    console.log(key);
     const command = new DeleteObjectCommand({
       Bucket: config.aws.bucket,
       Key: key,
@@ -68,21 +66,24 @@ export const uploadManyToS3 = async (
         : `${Math.floor(100000 + Math.random() * 900000)}${Date.now()}`;
 
       const fileKey = `${path}/${newFileName}`;
+      
       const command = new PutObjectCommand({
         Bucket: config.aws.bucket as string,
         Key: fileKey,
         Body: file?.buffer,
+        ContentType: file.mimetype,
+        ACL: ObjectCannedACL.public_read, //access public read
       });
 
-      await s3Client.send(command);
-
-      const url = `https://${config.aws.bucket}.s3.${config.aws.region}.amazonaws.com/${fileKey}`;
+      const nn = await s3Client.send(command); 
+      // const url = `${config?.aws?.s3BaseUrl}/${fileKey}`;
+      const url = `${config?.aws?.s3BaseUrl}/${fileKey}`;
       return { url, key: newFileName };
     });
 
     const uploadedUrls = await Promise.all(uploadPromises);
     return uploadedUrls;
-  } catch (error) {
+  } catch (error) { 
     throw new Error('File Upload failed');
   }
 };

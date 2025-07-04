@@ -5,3 +5,4 @@ logs/
 .vercel
 generateFolder.ts
 firebase-service-account.json
+bun.lock

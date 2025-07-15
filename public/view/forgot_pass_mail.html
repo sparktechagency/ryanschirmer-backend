@@ -1,42 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forgot Password - OTP Verification</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8f8f8;">
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8f8f8; padding: 30px 0;">
-    <tr>
-      <td align="center">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="background: linear-gradient(135deg, #ffffff 60%, #fff6e0 100%); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); overflow: hidden;">
-          <!-- Header -->
-          <tr>
-            <td style="padding: 40px 30px 20px; text-align: center; background: linear-gradient(135deg, #ffb719 0%, #ffcb4c 100%);">
-              <h1 style="color: #ffffff; font-size: 26px; margin: 0; font-weight: 700; letter-spacing: 0.5px;">Reset Your Password</h1>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding: 40px 30px; color: #333333; font-size: 16px; line-height: 1.6; text-align: center;">
-              <p style="margin: 0 0 15px; font-weight: 500;">Hello, {{email}}</p>
-              <p style="margin: 0 0 20px;">You have requested to reset your password. Please use the One-Time Password (OTP) below to proceed:</p>
-              <span onclick="try { navigator.clipboard.writeText('{{otp}}'); alert('OTP copied to clipboard!'); } catch(e) {console.log(e) }" style="display: inline-block; background-color: #ffb719; color: #ffffff; font-size: 28px; font-weight: 700; padding: 15px 35px; border-radius: 8px; letter-spacing: 2px; margin: 25px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); cursor: pointer;"> {{otp}} </span>
-              <p style="margin: 0 0 20px; color: #555555; font-size: 14px;">Click the OTP to copy (if supported) or manually copy it.</p>
-              <p style="margin: 0 0 20px; color: #555555;">This OTP is valid for <strong>3 minutes</strong>. For your security, do not share this code.</p>
-              <p style="margin: 0 0 25px; color: #555555;">If you didn’t request a password reset, please secure your account immediately.</p>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 25px 30px; background-color: #222222; text-align: center; color: #cccccc; font-size: 14px; line-height: 1.5;">
-              <p style="margin: 0 0 10px;">© 2025 Unleakd. All rights reserved.</p>
-              <p style="margin: 0;">Questions? Visit our <a href="https://unleakd.com" style="color: #ffb719; text-decoration: none; font-weight: 500;">Help Center</a></p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
+<!doctype html>
+<html>
+  <head>
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100%;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+      .email-body {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border: 1px solid #e5e5e5;
+        padding: 30px;
+        border-radius: 8px;
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .logo img {
+        width: 120px;
+      }
+      .otp-message {
+        font-size: 18px;
+        color: #333333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .otp-code {
+        display: inline-block;
+        font-size: 24px;
+        font-weight: bold;
+        color: #ffb719;
+        background-color: #ffb7191f;
+        padding: 10px 20px;
+        border-radius: 5px;
+      }
+      .cta {
+        text-align: center;
+        margin-top: 30px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #999999;
+        text-align: center;
+        margin-top: 30px;
+      }
+      .footer a {
+        color: #ffb719;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="email-body">
+        <div class="logo">
+          <img
+            src="https://api.unleakd.com/uploads/logo/logo.png"
+            alt="Unleakd Logo"
+          />
+        </div>
+        <div class="otp-message">
+          <p>Hello {{email}},</p>
+          <p>
+            We received a request to reset the password for your Unleakd account. Your One-Time Password (OTP) to reset your password is:
+          </p>
+          <p class="otp-code">{{otp}}</p>
+          <p>
+            This code is valid for 3 minutes. Please do not share this code with anyone.
+          </p>
+        </div>
+        <div class="cta">
+          <p>If you didn't request a password reset, please ignore this email.</p>
+          <p>Thank you for using Unleakd!</p>
+          <p>
+            <a href="https://unleakd.com/" style="color: #ffb719"
+              >Visit our website</a
+            >
+          </p>
+        </div>
+      </div>
+      <div class="footer">
+        <p>
+          If you need further assistance, please
+          <a href="mailto:r.e.schirmer1993@gmail.com">contact support</a>.
+        </p>
+      </div>
+    </div>
+  </body>
 </html>

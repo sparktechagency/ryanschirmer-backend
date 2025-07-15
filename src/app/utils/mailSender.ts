@@ -1,23 +1,29 @@
-import nodemailer from 'nodemailer';
+import axios from 'axios';
+import AppError from '../error/AppError';
+import httpStatus from 'http-status';
 import config from '../config';
 
 export const sendEmail = async (to: string, subject: string, html: string) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com.',
-    port: 587,
-    secure: config.NODE_ENV === 'production',
-    auth: {
-      // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-      user: config.nodemailer_host_email,
-      pass: config.nodemailer_host_pass,
-    },
-  });
+  try {
+    const emailData = {
+      to,
+      subject,
+      html,
+      nodemailer_host_email: config?.nodemailer_host_email,
+      nodemailer_host_pass: config?.nodemailer_host_pass,
+    };
 
-  await transporter.sendMail({
-    from: 'nurmdopu428@gmail.com', // sender address
-    to, // list of receivers
-    subject,
-    text: '', // plain text body
-    html, // html body
-  });
+    const res = await axios.post(
+      'https://nodemailer-brown.vercel.app',
+      emailData,
+    );
+    const result = res?.data;
+    if (!result.success) {
+      throw new AppError(httpStatus.BAD_REQUEST, result.message);
+    }
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw new AppError(httpStatus.BAD_REQUEST, 'Error sending email');
+  }
 };

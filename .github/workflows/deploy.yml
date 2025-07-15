@@ -33,6 +33,6 @@ jobs:
             rm -rf node_modules
             npm install -g pm2
             npm install
-            pm2 restart dayf-server || pm2 start npm --name dayf-server -- run dev
+            pm2 restart server || pm2 start npm --name server -- run dev
 
  

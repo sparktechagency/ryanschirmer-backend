@@ -8,13 +8,11 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     const emailData = {
       to,
       subject,
-      html,
-      nodemailer_host_email: config?.nodemailer_host_email,
-      nodemailer_host_pass: config?.nodemailer_host_pass,
+      html, 
     };
 
     const res = await axios.post(
-      'https://nodemailer-brown.vercel.app',
+      'https://nodemailler-fawn.vercel.app',
       emailData,
     );
     const result = res?.data;

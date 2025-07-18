@@ -32,7 +32,7 @@ app.use(
 const client = new smartcar.AuthClient({
   clientId: '6e70a4df-1277-4794-a0fe-1e17bcef256f',
   clientSecret: 'eea1f0db-918f-4c95-aab2-70782f977d2a',
-  redirectUri: 'https://api.unleakd.com/api/redirect',
+  redirectUri: 'https://api.unleakd.com/exchange',
   mode: 'simulated',
 });
 

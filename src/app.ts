@@ -32,8 +32,8 @@ app.use(
 const client = new smartcar.AuthClient({
   clientId: '6e70a4df-1277-4794-a0fe-1e17bcef256f',
   clientSecret: 'eea1f0db-918f-4c95-aab2-70782f977d2a',
-  redirectUri: 'https://api.unleakd.com/exchange',
-  mode: 'simulated',
+  redirectUri: 'https://api.unleakd.com/callback',
+  mode: 'test',
 });
 
 app.get('/login', async (req, res) => {
@@ -66,17 +66,36 @@ app.get('/exchange', async function (req, res) {
   }
 });
 
-app.get('/api/redirect', (req: Request, res: Response) => {
-  console.log({
-    body: req.body,
-    params: req.params,
-    query: req.query,
-  });
-  res.json({
-    body: req.body,
-    params: req.params,
-    query: req.query,
-  });
+app.get('/callback', async function (req, res, next) {
+  let access;
+
+  if (req.query.error) {
+    // the user denied your requested permissions
+    return next(new Error(req.query.error));
+  }
+  
+  // exchange auth code for access token
+  const tokens = await client.exchangeCode(req.query.code);
+  console.log("🚀 ~ tokens:", tokens)
+  // get the user's vehicles
+  const vehicles = await smartcar.getVehicles(tokens.accessToken);
+  // instantiate first vehicle in vehicle list
+  const vehicle = new smartcar.Vehicle(
+    vehicles.vehicles[0],
+    tokens.accessToken,
+  );
+  // get identifying information about a vehicle
+  const attributes = await vehicle.attributes();
+  console.log(attributes);
+  // {
+  //   "id": "36ab27d0-fd9d-4455-823a-ce30af709ffc",
+  //   "make": "TESLA",
+  //   "model": "Model S",
+  //   "year": 2014
+  //   "meta": {
+  //     "requestId": "ada7207c-3c0a-4027-a47f-6215ce6f7b93"
+  //   }
+  // }
 });
 
 // --------------------END TEST-------------------------------

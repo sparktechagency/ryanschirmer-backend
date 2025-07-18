@@ -9,6 +9,7 @@ import globalErrorHandler from './app/middleware/globalErrorhandler';
 import notFound from './app/middleware/notfound';
 import router from './app/routes';
 import axios from 'axios';
+import smartcar from 'smartcar';
 const app: Application = express();
 app.use(express.static('public'));
 app.use(express.json({ limit: '500mb' }));
@@ -27,7 +28,58 @@ app.use(
 
 // Remove duplicate static middleware
 // app.use(app.static('public'));
+// --------------------TEST-------------------------------
+const client = new smartcar.AuthClient({
+  clientId: '6e70a4df-1277-4794-a0fe-1e17bcef256f',
+  clientSecret: 'eea1f0db-918f-4c95-aab2-70782f977d2a',
+  redirectUri: 'https://api.unleakd.com/api/redirect',
+  mode: 'simulated',
+});
 
+app.get('/login', async (req, res) => {
+  const scope = ['read_vehicle_info'];
+  const authUrl = client.getAuthUrl(scope);
+
+  console.log('🚀 Redirecting to Smartcar:', authUrl);
+
+  // This can be a real page in your app; here we just send a link
+  res.send(`<a href="${authUrl}">Connect your car</a>`);
+});
+
+app.get('/exchange', async function (req, res) {
+  const code = req.query.code as string;
+
+  if (!code) {
+    return res.status(400).send('No code in query.');
+  }
+
+  try {
+    const access = await client.exchangeCode(code);
+    console.log('✅ Access Token:', access.accessToken);
+    console.log('🔄 Refresh Token:', access.refreshToken);
+    console.log('⏰ Expires In:', access.expiresIn);
+
+    res.send('Authorization successful! Check your terminal for tokens.');
+  } catch (error) {
+    console.error('❌ Token exchange error:', error);
+    res.status(500).send('Token exchange failed');
+  }
+});
+
+app.get('/api/redirect', (req: Request, res: Response) => {
+  console.log({
+    body: req.body,
+    params: req.params,
+    query: req.query,
+  });
+  res.json({
+    body: req.body,
+    params: req.params,
+    query: req.query,
+  });
+});
+
+// --------------------END TEST-------------------------------
 // application routes
 app.use('/api/v1', router);
 app.post('/return', async (req, res) => {

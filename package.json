@@ -71,7 +71,6 @@
     "install": "^0.13.0",
     "node-schedule": "^2.1.1",
     "npm": "^11.3.0",
-    "smartcar": "^9.15.0",
     "socket.io": "^4.7.5",
     "stripe": "^18.2.1",
     "ua-parser-js": "^2.0.3",

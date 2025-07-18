@@ -71,19 +71,23 @@ app.get('/callback', async function (req, res, next) {
 
   if (req.query.error) {
     // the user denied your requested permissions
+
     return next(new Error(req.query.error));
   }
-  
+
   // exchange auth code for access token
   const tokens = await client.exchangeCode(req.query.code);
-  console.log("🚀 ~ tokens:", tokens)
+  console.log('🚀 ~ tokens:', tokens);
   // get the user's vehicles
   const vehicles = await smartcar.getVehicles(tokens.accessToken);
+  console.log('🚀 ~ vehicles:', { vehicles });
   // instantiate first vehicle in vehicle list
   const vehicle = new smartcar.Vehicle(
     vehicles.vehicles[0],
     tokens.accessToken,
   );
+
+  console.log({ vehicle });
   // get identifying information about a vehicle
   const attributes = await vehicle.attributes();
   console.log(attributes);

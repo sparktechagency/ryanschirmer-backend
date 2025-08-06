@@ -1,5 +1,5 @@
 {
-  "name": "praying-backend",
+  "name": "Ryans-chirmer",
   "version": "1.0.0",
   "main": "src/server.ts",
   "scripts": {
@@ -16,7 +16,7 @@
     "start:prod": "node ./dist/server.js",
     "prepare": "husky"
   },
-  "author": "MD Nazmul Hasan",
+  "author": "nazmulhasan.dev",
   "license": "ISC",
   "description": "",
   "lint-staged": {
